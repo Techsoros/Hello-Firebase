@@ -2,6 +2,7 @@ import "./App.css";
 import app from "./firebase/firebase.init";
 import {
   getAuth,
+  GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
@@ -9,13 +10,22 @@ import {
 import { useState } from "react";
 
 const auth = getAuth(app);
-const dNone = { display: "none" };
-const dFlex = { display: "flex" };
 function App() {
   const [user, setUser] = useState({});
 
-  const signInHandler = () => {
+  const googleSignInHandler = () => {
     const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        setUser(user);
+      })
+      .catch((error) => {
+        alert("There is a problem ", error);
+      });
+  };
+  const githubSignInHandler = () => {
+    const provider = new GithubAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
@@ -41,29 +51,51 @@ function App() {
     <div className="App">
       <h2>Welcome to Firebase World</h2>
       {user.displayName || (
-        <button
-          style={{
-            display: "flex",
-            alignItems: "center",
-            margin: "0 auto",
-            gap: "20px",
-            borderRadius: "15px",
-            padding: "10px 15px",
-            outline: "0",
-            border: "1px solid #ddd",
-          }}
-          onClick={signInHandler}
-        >
-          <h4>Signup with</h4>
-          <img
-            src="https://cdn3.iconfinder.com/data/icons/logos-brands-3/24/logo_brand_brands_logos_google-512.png"
-            alt=""
-            width="50px"
-          />
-        </button>
+        <div className="button-box">
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "20px auto",
+              gap: "20px",
+              borderRadius: "15px",
+              padding: "10px 15px",
+              outline: "0",
+              border: "1px solid #ddd",
+            }}
+            onClick={googleSignInHandler}
+          >
+            <h4>Signup with</h4>
+            <img
+              src="https://cdn3.iconfinder.com/data/icons/logos-brands-3/24/logo_brand_brands_logos_google-512.png"
+              alt=""
+              width="50px"
+            />
+          </button>
+          <button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              margin: "0 auto",
+              gap: "20px",
+              borderRadius: "15px",
+              padding: "10px 15px",
+              outline: "0",
+              border: "1px solid #ddd",
+            }}
+            onClick={githubSignInHandler}
+          >
+            <h4>Signup with</h4>
+            <img
+              src="https://cdn1.iconfinder.com/data/icons/unicons-line-vol-3/24/github-256.png"
+              alt=""
+              width="50px"
+            />
+          </button>
+        </div>
       )}
 
-      {user.email && (
+      {user.displayName && (
         <div className="">
           <div
             className="user-profile"
@@ -82,12 +114,12 @@ function App() {
               <img
                 src={user.photoURL}
                 alt=""
-                style={{ borderRadius: "9999px" }}
+                style={{ borderRadius: "9999px", maxWidth: "200px" }}
               />
             </div>
-            <div className="uder-body">
+            <div className="user-body">
               <h3>name : {user.displayName}</h3>
-              <p>email : {user.email}</p>
+              <p>email : {user.email || "githubnotProvided@gmail.com"}</p>
             </div>
           </div>
           <button
